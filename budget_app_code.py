@@ -25,3 +25,37 @@ class Category():
             line+=f"{des:<23}{amt:>7}\n"
         total=f"Total: {self.get_balance():.2f}\n"
         return tittle+line+total
+    
+def create_spend_chart(categories):
+    spent = []
+    for cat in categories:
+        total = 0
+        for item in cat.ledger:
+            if item["amount"] < 0:
+                total += -item["amount"]
+        spent.append(total)
+
+    total_spent = sum(spent)
+    percentages = [(s / total_spent) * 100 for s in spent]
+    rounded = [int(p // 10 * 10) for p in percentages]
+
+    chart = "Percentage spent by category\n"
+
+    for i in range(100, -1, -10):
+        chart += f"{i:>3}|"
+        for p in rounded:
+            chart += " o " if p >= i else "   "
+        chart += " \n"
+
+    chart += "    " + "-" * (len(categories) * 3 + 1) + "\n"
+
+    names = [cat.name for cat in categories]
+    max_len = max(len(name) for name in names)
+
+    for i in range(max_len):
+        chart += "     "
+        for name in names:
+            chart += (name[i] if i < len(name) else " ") + "  "
+        chart += "\n"
+
+    return chart.rstrip("\n")
